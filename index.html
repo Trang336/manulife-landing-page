@@ -224,24 +224,24 @@
               pháp bảo vệ vừa vặn với mục tiêu tài chính cá nhân.
             </p>
           </div>
-          <form class="lead-form">
+         <form name="submit-to-google-sheet" class="lead-form">
             <label>
               Họ và tên
-              <input type="text" placeholder="Nguyễn Văn A" />
+              <input type="text" name="Name" placeholder="Nguyễn Văn A" required />
             </label>
             <label>
               Số điện thoại
-              <input type="tel" placeholder="0900 000 000" />
+              <input type="tel" name="Phone" placeholder="0900 000 000" required />
             </label>
             <label>
               Mối quan tâm
-              <select>
+              <select name="Interest">
                 <option>Bảo vệ gia đình</option>
                 <option>Tích lũy dài hạn</option>
                 <option>Kế hoạch di sản</option>
               </select>
             </label>
-            <button type="button" class="btn btn-primary btn-full">Đăng ký tư vấn</button>
+            <button type="submit" class="btn btn-primary btn-full">Đăng ký tư vấn</button>
           </form>
         </section>
       </main>
