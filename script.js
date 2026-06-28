@@ -1,5 +1,7 @@
 const revealElements = document.querySelectorAll(".reveal");
 
+const scriptURL = 'https://script.google.com/macros/s/AKfycbxEq9iI6MeoWb534ycv8e0TQ9I4RwbPkCPnQu2C6KfcHqlYzkvxaey4HEAX9AnocWXZXw/exec';
+
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
@@ -47,3 +49,17 @@ if (formButton) {
     formButton.style.opacity = "0.88";
   });
 }
+
+const form = document.forms['submit-to-google-sheet']
+
+form.addEventListener('submit', e => {
+  e.preventDefault()
+  alert("Đang gửi thông tin đăng ký tư vấn...")
+
+  fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+    .then(response => {
+        alert("Đăng ký thành công! Trang sẽ liên hệ lại bạn sớm nhất nhé.");
+        form.reset();
+    })
+    .catch(error => console.error('Lỗi rồi bạn ơi!', error.message))
+})
