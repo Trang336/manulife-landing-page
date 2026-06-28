@@ -1,7 +1,5 @@
 const revealElements = document.querySelectorAll(".reveal");
 
-const scriptURL = 'https://script.google.com/macros/s/AKfycbxEq9iI6MeoWb534ycv8e0TQ9I4RwbPkCPnQu2C6KfcHqlYzkvxaey4HEAX9AnocWXZXw/exec';
-
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
@@ -40,26 +38,77 @@ if (heroCard) {
   heroCard.addEventListener("mouseleave", resetCard);
 }
 
-const formButton = document.querySelector(".lead-form button");
+const leadForm = document.querySelector(".lead-form");
 
-if (formButton) {
-  formButton.addEventListener("click", () => {
-    formButton.textContent = "Cảm ơn, chúng tôi sẽ liên hệ sớm";
-    formButton.disabled = true;
-    formButton.style.opacity = "0.88";
+if (leadForm) {
+  const submitButton = leadForm.querySelector("button");
+  const statusElement = leadForm.querySelector(".form-status");
+  const defaultButtonText = submitButton.textContent;
+
+  const setStatus = (message, type = "") => {
+    statusElement.textContent = message;
+    statusElement.classList.remove("is-error", "is-success");
+
+    if (type) {
+      statusElement.classList.add(type);
+    }
+  };
+
+  leadForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const endpoint = leadForm.dataset.endpoint;
+
+    if (!endpoint || endpoint === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
+      setStatus(
+        "Bạn chưa cấu hình Google Apps Script URL. Hãy thay `data-endpoint` trong form bằng URL Web App đã deploy.",
+        "is-error"
+      );
+      return;
+    }
+
+    const formData = new FormData(leadForm);
+    const payload = {
+      fullName: formData.get("fullName")?.toString().trim() || "",
+      phone: formData.get("phone")?.toString().trim() || "",
+      email: formData.get("email")?.toString().trim() || "",
+      interest: formData.get("interest")?.toString().trim() || "",
+      note: formData.get("note")?.toString().trim() || "",
+      pageUrl: window.location.href,
+      submittedAt: new Date().toISOString(),
+    };
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Đang gửi...";
+    submitButton.style.opacity = "0.88";
+    setStatus("Đang gửi thông tin, vui lòng chờ...");
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok || result.result !== "success") {
+        throw new Error(result.message || "Không thể gửi dữ liệu.");
+      }
+
+      setStatus("Gửi thành công. Đội ngũ tư vấn sẽ liên hệ với bạn sớm.", "is-success");
+      leadForm.reset();
+    } catch (error) {
+      setStatus(
+        error.message || "Có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại.",
+        "is-error"
+      );
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = defaultButtonText;
+      submitButton.style.opacity = "1";
+    }
   });
 }
-
-const form = document.forms['submit-to-google-sheet']
-
-form.addEventListener('submit', e => {
-  e.preventDefault()
-  alert("Đang gửi thông tin đăng ký tư vấn...")
-
-  fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-    .then(response => {
-        alert("Đăng ký thành công! Trang sẽ liên hệ lại bạn sớm nhất nhé.");
-        form.reset();
-    })
-    .catch(error => console.error('Lỗi rồi bạn ơi!', error.message))
-})
