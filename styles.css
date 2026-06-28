@@ -604,6 +604,21 @@ select {
   font-size: 0.95rem;
 }
 
+.form-status {
+  min-height: 24px;
+  margin: 2px 2px 0;
+  font-size: 0.92rem;
+  color: #ffd8cb;
+}
+
+.form-status.is-error {
+  color: #ffb1b1;
+}
+
+.form-status.is-success {
+  color: #ffd8cb;
+}
+
 .lead-form input,
 .lead-form select {
   width: 100%;
